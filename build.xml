@@ -1,0 +1,55 @@
+<project name="MyProject" default="compile" basedir=".">
+ 
+    <property name="sourcedir" value="${basedir}/src"/> 
+    <property name="webdir" value="${basedir}/build"/>
+    <property name="javaSourcedir" value="${sourcedir}/WEB-INF/classes"/>
+    <property name="webClassdir" value="${webdir}/WEB-INF/classes"/>
+    <property name="webClassLib" value="${webdir}/WEB-INF/lib"/>
+    <property name="compileLibDir" value="${basedir}/lib"/>
+	  <property name="catalina.home" value="d:\\apps_instaled\\apache-tomcat-6.0.43"/>
+
+    <path id="libraries">
+        <fileset dir="${compileLibDir}">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="clean">
+        <delete dir="${webdir}"/>
+    	<delete file="${basedir}/demo.war"></delete>
+        <mkdir dir="${webClassdir}"/>
+    </target>
+
+    <target name="copy">
+        <copy todir="${webdir}">
+            <fileset dir="${sourcedir}">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    
+    <target name="compile" depends="clean, copy">
+      <javac srcdir="${javaSourcedir}"
+             destdir="${webClassdir}"
+             classpathref="libraries"
+      			source="1.6"
+      			target="1.6"/>
+      <copy todir="${webClassLib}">
+            <fileset dir="${compileLibDir}">
+                <exclude name="**/servlet-api.jar"/>
+            </fileset>
+      </copy>
+
+      <war warfile="${basedir}/demo.war" basedir="${webdir}" webxml="${webdir}/WEB-INF/web.xml">
+          <exclude name="WEB-INF/web.xml"/>
+      </war>
+           
+    </target>
+	
+	<target name="redeploy" depends="compile">
+			<copy file="${basedir}/demo.war" todir="${catalina.home}/webapps" ></copy>
+		</target>
+
+	
+</project>
+
